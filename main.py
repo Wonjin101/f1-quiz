@@ -1,3 +1,9 @@
+import json
+import os
+
+STATE_FILE = "state.json"
+
+
 class Quiz:
     def __init__(self, question, choices, answer):
         self.question = question
@@ -24,11 +30,14 @@ class Quiz:
 
     @classmethod
     def from_dict(cls, data):
-        return cls(
-            question=data["question"],
-            choices=data["choices"],
-            answer=data["answer"]
-        )
+        if not isinstance(data, dict):
+            raise ValueError("퀴즈 데이터가 딕셔너리 형식이 아닙니다.")
+        question = str(data["question"]).strip()
+        choices = data["choices"]
+        answer = int(data["answer"])
+        if not question or not isinstance(choices, list) or len(choices) != 4 or not (1 <= answer <= 4):
+            raise ValueError("퀴즈 데이터 필드 형식이 올바르지 않습니다.")
+        return cls(question=question, choices=[str(c) for c in choices], answer=answer)
 
 
 def get_default_quizzes():
@@ -62,9 +71,52 @@ def get_default_quizzes():
 
 
 class QuizGame:
-    def __init__(self):
-        self.quizzes = get_default_quizzes()
+    def __init__(self, state_file=STATE_FILE):
+        self.state_file = state_file
+        self.quizzes = []
         self.best_score = None
+        self.load_state()
+
+    def load_state(self):
+        """state.json 파일에서 퀴즈 목록과 최고 점수를 불러옵니다."""
+        if not os.path.exists(self.state_file):
+            self.quizzes = get_default_quizzes()
+            self.best_score = None
+            self.save_state()
+            return
+
+        try:
+            with open(self.state_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            if not isinstance(data, dict) or "quizzes" not in data:
+                raise ValueError("state.json 필수 키(quizzes)가 누락되었습니다.")
+
+            loaded_quizzes = [Quiz.from_dict(q) for q in data["quizzes"]]
+            best_score = data.get("best_score", None)
+            if best_score is not None and not isinstance(best_score, int):
+                best_score = int(best_score)
+
+            self.quizzes = loaded_quizzes if loaded_quizzes else get_default_quizzes()
+            self.best_score = best_score
+        except (json.JSONDecodeError, KeyError, ValueError, TypeError, OSError) as e:
+            print(f"\n⚠️ 데이터 파일({self.state_file})이 손상되었거나 읽을 수 없습니다: {e}")
+            print("👉 기본 F1 퀴즈 데이터로 초기화하여 복구합니다.")
+            self.quizzes = get_default_quizzes()
+            self.best_score = None
+            self.save_state()
+
+    def save_state(self):
+        """현재 퀴즈 목록과 최고 점수를 state.json 파일에 UTF-8로 저장합니다."""
+        data = {
+            "quizzes": [q.to_dict() for q in self.quizzes],
+            "best_score": self.best_score
+        }
+        try:
+            with open(self.state_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except OSError as e:
+            print(f"\n⚠️ 데이터 저장 중 오류가 발생했습니다: {e}")
 
     def get_number_input(self, prompt, min_val, max_val):
         while True:
@@ -131,6 +183,7 @@ class QuizGame:
         if self.best_score is None or score > self.best_score:
             self.best_score = score
             print(f"🏆 최고 점수가 {self.best_score}점으로 갱신되었습니다!")
+            self.save_state()
 
     def add_quiz(self):
         print("\n" + "-" * 35)
@@ -147,7 +200,8 @@ class QuizGame:
 
         new_quiz = Quiz(question, choices, answer)
         self.quizzes.append(new_quiz)
-        print(f"\n✅ 새로운 퀴즈가 등록되었습니다! (현재 총 {len(self.quizzes)}문제)")
+        self.save_state()
+        print(f"\n✅ 새로운 퀴즈가 등록 및 저장되었습니다! (현재 총 {len(self.quizzes)}문제)")
 
     def list_quizzes(self):
         print("\n" + "-" * 35)
@@ -190,10 +244,12 @@ class QuizGame:
                 elif choice == 4:
                     self.show_best_score()
                 elif choice == 5:
-                    print("\n🏁 F1 퀴즈 게임을 종료합니다. 감사합니다!")
+                    self.save_state()
+                    print("\n🏁 데이터를 저장하고 F1 퀴즈 게임을 종료합니다. 감사합니다!")
                     break
         except (KeyboardInterrupt, EOFError):
-            print("\n\n⚠️ 프로그램 강제 종료가 감지되었습니다. 안전하게 종료합니다.")
+            print("\n\n⚠️ 프로그램 강제 종료가 감지되었습니다. 현재 상태를 저장하고 안전하게 종료합니다.")
+            self.save_state()
 
 
 def main():
