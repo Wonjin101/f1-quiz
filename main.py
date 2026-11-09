@@ -78,6 +78,15 @@ def get_number_input(prompt, min_val, max_val):
         return number
 
 
+def get_text_input(prompt):
+    while True:
+        text = input(prompt).strip()
+        if not text:
+            print("⚠️ 내용이 비어 있습니다. 다시 입력해 주세요.")
+            continue
+        return text
+
+
 def play_quiz(quizzes):
     if not quizzes:
         print("\n⚠️ 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
@@ -107,6 +116,24 @@ def play_quiz(quizzes):
     return score
 
 
+def add_quiz(quizzes):
+    print("\n" + "-" * 35)
+    print("➕ [새로운 F1 퀴즈 추가]")
+    print("-" * 35)
+
+    question = get_text_input("문제 내용을 입력하세요: ")
+    choices = []
+    for i in range(1, 5):
+        choice = get_text_input(f"선택지 {i}번을 입력하세요: ")
+        choices.append(choice)
+
+    answer = get_number_input("정답 번호를 입력하세요 (1-4): ", 1, 4)
+
+    new_quiz = Quiz(question, choices, answer)
+    quizzes.append(new_quiz)
+    print(f"\n✅ 새로운 퀴즈가 등록되었습니다! (현재 총 {len(quizzes)}문제)")
+
+
 def show_menu():
     print("\n" + "=" * 35)
     print("   🏎️  F1(포뮬러 1) 상식 퀴즈 게임  🏁")
@@ -128,7 +155,7 @@ def main():
             if choice == 1:
                 play_quiz(quizzes)
             elif choice == 2:
-                print("\n👉 [퀴즈 추가] 화면입니다. (구현 예정)")
+                add_quiz(quizzes)
             elif choice == 3:
                 print("\n👉 [퀴즈 목록] 화면입니다. (구현 예정)")
             elif choice == 4:
