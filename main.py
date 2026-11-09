@@ -78,6 +78,35 @@ def get_number_input(prompt, min_val, max_val):
         return number
 
 
+def play_quiz(quizzes):
+    if not quizzes:
+        print("\n⚠️ 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
+        return 0
+
+    print("\n" + "-" * 35)
+    print(f"🏎️ 퀴즈를 시작합니다! (총 {len(quizzes)}문제)")
+    print("-" * 35)
+
+    correct_count = 0
+    for idx, quiz in enumerate(quizzes, start=1):
+        quiz.display(idx)
+        user_answer = get_number_input("정답 번호를 입력하세요 (1-4): ", 1, 4)
+
+        if quiz.check_answer(user_answer):
+            print("✅ 정답입니다!")
+            correct_count += 1
+        else:
+            correct_choice = quiz.choices[quiz.answer - 1]
+            print(f"❌ 오답입니다! (정답: {quiz.answer}번 - {correct_choice})")
+
+    score = int((correct_count / len(quizzes)) * 100)
+    print("\n" + "=" * 35)
+    print("🏁 [퀴즈 결과]")
+    print(f"총 {len(quizzes)}문제 중 {correct_count}문제 정답! (점수: {score}점)")
+    print("=" * 35)
+    return score
+
+
 def show_menu():
     print("\n" + "=" * 35)
     print("   🏎️  F1(포뮬러 1) 상식 퀴즈 게임  🏁")
@@ -91,12 +120,13 @@ def show_menu():
 
 
 def main():
+    quizzes = get_default_quizzes()
     try:
         while True:
             show_menu()
             choice = get_number_input("메뉴 번호를 선택하세요 (1-5): ", 1, 5)
             if choice == 1:
-                print("\n👉 [퀴즈 풀기] 화면입니다. (구현 예정)")
+                play_quiz(quizzes)
             elif choice == 2:
                 print("\n👉 [퀴즈 추가] 화면입니다. (구현 예정)")
             elif choice == 3:
