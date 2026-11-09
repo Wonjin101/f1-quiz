@@ -30,3 +30,6 @@ Python의 객체 지향 프로그래밍(클래스)과 표준 라이브러리(jso
 - **스키마 구성:**
   - `quizzes` (list): 각 퀴즈의 `question`(문자열), `choices`(문자열 4개 리스트), `answer`(1~4 정수)를 담은 객체 배열
   - `best_score` (int 또는 null): 최고 점수 기록
+
+---
+* Git clone 및 pull 동기화 실습 완료
