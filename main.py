@@ -1,8 +1,8 @@
 class Quiz:
     def __init__(self, question, choices, answer):
-        self.question = question  # 문제 문자열
-        self.choices = choices    # 4개의 선택지 리스트
-        self.answer = answer      # 정답 번호 (1~4)
+        self.question = question
+        self.choices = choices
+        self.answer = answer
 
     def display(self, index=None):
         if index is not None:
@@ -134,6 +134,24 @@ def add_quiz(quizzes):
     print(f"\n✅ 새로운 퀴즈가 등록되었습니다! (현재 총 {len(quizzes)}문제)")
 
 
+def list_quizzes(quizzes):
+    print("\n" + "-" * 35)
+    print(f"📋 [저장된 F1 퀴즈 목록] (총 {len(quizzes)}문제)")
+    print("-" * 35)
+
+    if not quizzes:
+        print("⚠️ 등록된 퀴즈가 없습니다.")
+        return
+
+    for idx, quiz in enumerate(quizzes, start=1):
+        print(f"{idx}. {quiz.question}")
+        for c_idx, choice in enumerate(quiz.choices, start=1):
+            print(f"   {c_idx}) {choice}")
+        print(f"   👉 정답: {quiz.answer}번 ({quiz.choices[quiz.answer - 1]})\n")
+
+    input("확인하셨으면 엔터(Enter)를 눌러 메뉴로 돌아가세요...")
+
+
 def show_menu():
     print("\n" + "=" * 35)
     print("   🏎️  F1(포뮬러 1) 상식 퀴즈 게임  🏁")
@@ -157,7 +175,7 @@ def main():
             elif choice == 2:
                 add_quiz(quizzes)
             elif choice == 3:
-                print("\n👉 [퀴즈 목록] 화면입니다. (구현 예정)")
+                list_quizzes(quizzes)
             elif choice == 4:
                 print("\n👉 [점수 확인] 화면입니다. (구현 예정)")
             elif choice == 5:
