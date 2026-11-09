@@ -90,7 +90,7 @@ def get_text_input(prompt):
 def play_quiz(quizzes):
     if not quizzes:
         print("\n⚠️ 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
-        return 0
+        return None
 
     print("\n" + "-" * 35)
     print(f"🏎️ 퀴즈를 시작합니다! (총 {len(quizzes)}문제)")
@@ -152,6 +152,17 @@ def list_quizzes(quizzes):
     input("확인하셨으면 엔터(Enter)를 눌러 메뉴로 돌아가세요...")
 
 
+def show_best_score(best_score):
+    print("\n" + "-" * 35)
+    print("🏆 [최고 점수 확인]")
+    print("-" * 35)
+    if best_score is None:
+        print("아직 퀴즈를 풀지 않았습니다. 먼저 퀴즈 풀기에 도전해 보세요!")
+    else:
+        print(f"현재 최고 점수는 {best_score}점입니다! 🎉")
+    input("\n확인하셨으면 엔터(Enter)를 눌러 메뉴로 돌아가세요...")
+
+
 def show_menu():
     print("\n" + "=" * 35)
     print("   🏎️  F1(포뮬러 1) 상식 퀴즈 게임  🏁")
@@ -166,18 +177,23 @@ def show_menu():
 
 def main():
     quizzes = get_default_quizzes()
+    best_score = None
     try:
         while True:
             show_menu()
             choice = get_number_input("메뉴 번호를 선택하세요 (1-5): ", 1, 5)
             if choice == 1:
-                play_quiz(quizzes)
+                score = play_quiz(quizzes)
+                if score is not None:
+                    if best_score is None or score > best_score:
+                        best_score = score
+                        print(f"🏆 최고 점수가 {best_score}점으로 갱신되었습니다!")
             elif choice == 2:
                 add_quiz(quizzes)
             elif choice == 3:
                 list_quizzes(quizzes)
             elif choice == 4:
-                print("\n👉 [점수 확인] 화면입니다. (구현 예정)")
+                show_best_score(best_score)
             elif choice == 5:
                 print("\n🏁 F1 퀴즈 게임을 종료합니다. 감사합니다!")
                 break
