@@ -1,3 +1,36 @@
+class Quiz:
+    def __init__(self, question, choices, answer):
+        self.question = question  # 문제 문자열
+        self.choices = choices    # 4개의 선택지 리스트
+        self.answer = answer      # 정답 번호 (1~4)
+
+    def display(self, index=None):
+        if index is not None:
+            print(f"\n[문제 {index}] {self.question}")
+        else:
+            print(f"\nQ. {self.question}")
+        for idx, choice in enumerate(self.choices, start=1):
+            print(f"  {idx}) {choice}")
+
+    def check_answer(self, user_answer):
+        return self.answer == user_answer
+
+    def to_dict(self):
+        return {
+            "question": self.question,
+            "choices": self.choices,
+            "answer": self.answer
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            question=data["question"],
+            choices=data["choices"],
+            answer=data["answer"]
+        )
+
+
 def get_number_input(prompt, min_val, max_val):
     while True:
         raw_input = input(prompt).strip()
@@ -14,6 +47,7 @@ def get_number_input(prompt, min_val, max_val):
             continue
         return number
 
+
 def show_menu():
     print("\n" + "=" * 35)
     print("   🏎️  F1(포뮬러 1) 상식 퀴즈 게임  🏁")
@@ -24,6 +58,7 @@ def show_menu():
     print("4. 점수 확인")
     print("5. 종료")
     print("=" * 35)
+
 
 def main():
     try:
@@ -43,6 +78,7 @@ def main():
                 break
     except (KeyboardInterrupt, EOFError):
         print("\n\n⚠️ 프로그램 강제 종료가 감지되었습니다. 안전하게 종료합니다.")
+
 
 if __name__ == "__main__":
     main()
