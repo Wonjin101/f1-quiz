@@ -97,7 +97,7 @@ class QuizGame:
             if best_score is not None and not isinstance(best_score, int):
                 best_score = int(best_score)
 
-            self.quizzes = loaded_quizzes if loaded_quizzes else get_default_quizzes()
+            self.quizzes = loaded_quizzes
             self.best_score = best_score
         except (json.JSONDecodeError, KeyError, ValueError, TypeError, OSError) as e:
             print(f"\n⚠️ 데이터 파일({self.state_file})이 손상되었거나 읽을 수 없습니다: {e}")
